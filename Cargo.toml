@@ -1,6 +1,6 @@
 [package]
 name = "sbga-dec"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 description = "Advanced sega hdd decryptor, written in rust"
 authors = ["AsakuraMizu"]
