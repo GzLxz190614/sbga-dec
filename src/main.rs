@@ -2,7 +2,7 @@ use std::{
     fs::File,
     io::{BufReader, BufWriter, Read, Seek, SeekFrom, Write},
     path::PathBuf,
-    sync::mpsc::channel,
+    sync::{mpsc::channel, Arc},
     thread::spawn,
 };
 
@@ -134,7 +134,7 @@ fn main() -> anyhow::Result<()> {
             .progress_chars("#>-"),
     );
 
-    let (tx, rx) = channel::<[u8; 0x1000]>();
+    let (tx, rx) = channel::<Arc<[u8]>>();
     let handle = spawn(move || -> anyhow::Result<()> {
         let mut writer = BufWriter::new(of);
         for buf in rx {
@@ -155,7 +155,7 @@ fn main() -> anyhow::Result<()> {
                     local_iv[i] = iv[i] ^ ((offset >> ((i % 8) << 3)) as u8);
                 }
                 decrypt_chunk_mut(&mut buf, &key, &local_iv);
-                tx.send(buf)?;
+                tx.send(buf.into())?;
                 offset += n;
                 pb.set_position(offset as u64);
             }
